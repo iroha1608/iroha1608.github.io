@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'">
+<title>Obsidian で開く</title>
+<!--
+  Discord の通知から Obsidian のノートを開くための中継ページ（news-digest）。
+  Discord は obsidian:// のリンクを押せるようにしないので、https のこのページを経由する。
+
+  使い方: https://<ユーザー名>.github.io/obsidian/#vault=<Vault の名前>&file=<ノートの場所>
+  - Vault の名前とノートの場所は # の後ろにあるので、このページのサーバーには送られない
+  - 開けるのは obsidian://open?vault=…&file=… だけ（ほかのサイトへは飛ばない）
+  - 外部のファイルは読み込まない（記事の内容も持たない）
+-->
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    background: Canvas;
+    color: CanvasText;
+  }
+  main { max-width: 32rem; margin: 0 auto; padding: 2.5rem 1rem; text-align: center; }
+  h1 { font-size: 1.25rem; }
+  #file { word-break: break-all; opacity: 0.75; font-size: 0.9rem; }
+  #open {
+    display: inline-block;
+    margin: 1.5rem 0;
+    padding: 0.9rem 1.6rem;
+    border-radius: 0.6rem;
+    background: #7c3aed;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  .note { font-size: 0.85rem; opacity: 0.75; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Obsidian で開く</h1>
+  <p id="file"></p>
+  <a id="open" href="#">Obsidian で開く</a>
+  <p class="note" id="message">自動で開かないときは、上のボタンを押してください。</p>
+</main>
+<script>
+  (function () {
+    var params = new URLSearchParams(location.hash.slice(1));
+    var vault = params.get("vault");
+    var file = params.get("file");
+    var button = document.getElementById("open");
+    if (!vault || !file) {
+      button.hidden = true;
+      document.getElementById("message").textContent =
+        "リンクが正しくありません（Vault の名前とノートの場所がありません）。";
+      return;
+    }
+    var url = "obsidian://open?vault=" + encodeURIComponent(vault) +
+      "&file=" + encodeURIComponent(file);
+    button.href = url;
+    document.getElementById("file").textContent = file;
+    location.replace(url);
+  })();
+</script>
+</body>
+</html>
